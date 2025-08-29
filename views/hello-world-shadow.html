@@ -95,18 +95,16 @@
 
       console.log(sender);
       // 서버로 GET 요청보내기
-      fetch("/hello-world/message/" + sender, {
+      fetch("/hello-world/message?sender=" + sender, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       })
         .then((response) => response.json())
         .then((json) => {
           // 결과 업데이트하기
-          inputMessage.value = "";
-          inputSender.value = "";
-
           result_p.innerText = "QUERY: " + JSON.stringify(json);
         });
     });
   </script>
 </html>
+
