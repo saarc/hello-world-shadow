@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mytoken Shadow Client</title>
+    <!-- 라이브러리 추가 bootstrap css+js+icon -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+      crossorigin="anonymous"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <div class="mb-3 mt-5">
+        <!-- 제목 -->
+        <br />
+        <h2><i class="bi bi-coin"></i> MyToken Shadow Client</h2>
+      </div>
+      <div class="mb-3">
+        <!-- 입력폼 + 버튼 -->
+        <form action="#">
+          <!-- from -->
+          <label for="" class="form-label">보내는 계정주소: </label><br />
+          <input type="text" id="from" class="form-control" /><br />
+          <!-- to -->
+          <label for="" class="form-label">받는 계정주소: </label><br />
+          <input type="text" id="to" class="form-control" /><br />
+          <!-- amount -->
+          <label for="" class="form-label">보내는 토큰: </label><br />
+          <input type="text" id="amount" class="form-control" /><br />
+        </form>
+        <br />
+        <!-- 버튼 -->
+        <button id="mintBtn" class="btn btn-outline-danger">토큰발행</button>
+        &nbsp;
+        <button id="qryBtn" class="btn btn-outline-info">토큰조회</button>
+        &nbsp;
+        <button id="transBtn" class="btn btn-outline-danger">토큰전송</button>
+        <br />
+      </div>
+      <div class="mb-3">
+        <!-- 결과 -->
+        <p id="txResult"></p>
+      </div>
+    </div>
+  </body>
+  <script>
+    // 발행버튼 클릭 이벤트처리
+    // 조회버튼 클릭 이벤트처리
+    // 전송버튼 클릭 이벤트처리
+    document.getElementById("transBtn").addEventListener("click", (event) => {
+      // 사용자 입력값 가져오기
+      const inputFrom = document.getElementById("from");
+      const from = inputFrom.value;
+      const inputTo = document.getElementById("to");
+      const to = inputTo.value;
+      const inputAmount = document.getElementById("amount");
+      const amount = inputAmount.value;
+
+      // 결과 업데이트영역 객체 가져오기
+      const result_p = document.getElementById("txResult");
+
+      // 서버로 /mytoken/mt/tx POST 요청보내기
+      fetch("/mytoken/mt/tx", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ from, to, amount }),
+      })
+        .then((response) => response.json())
+        .then((json) => {
+          // 결과 업데이트 하기
+          inputAmount.value = "";
+
+          result_p.innerText = "TRANSFER: " + JSON.stringify(json);
+        });
+    });
+  </script>
+</html>
