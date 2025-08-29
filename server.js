@@ -7,8 +7,12 @@ const path = require("path");
 // web3 가져오기, 연결하기, WEB3와 컨트랙트 객체화
 const { Web3 } = require("web3");
 const web3 = new Web3("http://localhost:7545");
+
 const contract = require("./contracts/helloworld.js");
 const sc = new web3.eth.Contract(contract.abi, contract.address);
+
+const tcontract = require("./contracts/mytoken.js");
+const tsc = new web3.eth.Contract(tcontract.abi, tcontract.address);
 
 // 서버설정
 const port = 3000; // 0~65535, 0~1024 예약포트, 1024~ 이후로 사용
@@ -19,7 +23,7 @@ app.use(express.urlencoded({ extended: true })); // for parsing application/x-ww
 
 // 라우팅 url : / , method: GET
 app.get("/", (request, response) => {
-  response.send("Hello World!");
+  response.sendFile(path.join(__dirname, "views", "index.html"));
 });
 
 // 라우팅 url : /hello-world, method: GET
@@ -28,6 +32,12 @@ app.get("/hello-world", (req, res) => {
   console.log("hello-world-shadow.html sent.");
 
   res.sendFile(path.join(__dirname, "views", "hello-world-shadow.html"));
+});
+
+// 라우팅 /mytoke GET
+app.get("/mytoken", (req, res) => {
+  console.log("mytoken-shadow.html sent.");
+  res.sendFile(path.join(__dirname, "views", "mytoken-shadow.html"));
 });
 
 // 라우팅 url : /hello-world/message, method: PUT
@@ -58,7 +68,7 @@ app.get("/hello-world/message", async (req, res) => {
   // 요청문서에서 데이터 꺼내기
   const sender = req.query.sender;
 
-  console.log("query message requested: ", sender);
+  console.log("(HELLOWORLD)query message requested: ", sender);
 
   try {
     const message = await sc.methods.message().call();
@@ -70,6 +80,32 @@ app.get("/hello-world/message", async (req, res) => {
     res.status(500).send(error);
   }
 });
+
+// 라우팅 url : /mytoken/mt/tx, method:POST
+app.post("/mytoken/mt/tx", async (req, res) => {
+  // 요청문서에서 데이터 꺼내기
+  const from = req.body.from;
+  const to = req.body.to;
+  const amount = req.body.amount;
+
+  // 로그남기기
+  console.log("(MYTOKEN)trans message requested: ", from, to, amount);
+
+  try {
+    // contract 전송호출
+    const message = await tsc.methods.transfer(to, amount).send({ from: from });
+    // const blockNumber = Number(await web3.eth.getBlockNumber());
+    // 결과응답하기
+    txhash = message.transactionHash;
+    res.status(200).send({ txhash });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send(error);
+  }
+});
+
+// (TODO) 라우팅 /mytoken/mt GET
+// (TODO) 라우팅 /mytoken/mt POST
 
 // 서버 시작 (listen)
 app.listen(port, () => {
