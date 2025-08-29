@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hello World Shadow Client</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+      crossorigin="anonymous"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <div class="mb-3">
+        <!-- 제목 -->
+        <br />
+        <h2><i class="bi bi-shadows"></i> Hello World Shadow Client</h2>
+      </div>
+      <div class="mb-3">
+        <!-- 입력폼 -->
+        <form action="#">
+          <!-- 계정주소 -->
+          <label for="" class="form-label">이더리움 주소: </label><br />
+          <input type="text" id="sender" class="form-control" /><br />
+          <!-- 새로운메세지  -->
+          <label for="" class="form-label">새로운 메세지: </label><br />
+          <input type="text" id="newMessage" class="form-control" /><br />
+        </form>
+        <br />
+        <!-- 버튼 -->
+        <button id="txButton" class="btn btn-outline-danger">
+          트랜젝션 제출
+        </button>
+        &nbsp;
+        <button id="qryButton" class="btn btn-outline-info">
+          스테이트 조회
+        </button>
+        <br />
+      </div>
+      <div class="mb-3">
+        <!-- 서버로부터 받아온 메세지 -->
+        <p id="txResult"></p>
+      </div>
+    </div>
+
+    <br /><br /><br />
+  </body>
+  <script>
+    document.getElementById("txButton").addEventListener("click", (event) => {
+      // 사용자폼에서 사용자입력값 가져오기
+      const inputSender = document.getElementById("sender");
+      const sender = inputSender.value;
+
+      const inputMessage = document.getElementById("newMessage");
+      const message = inputMessage.value;
+
+      // 결과 업데이트영역 객체 가져오기
+      const result_p = document.getElementById("txResult");
+
+      console.log(sender, message);
+      // 서버로 PUT 요청보내기
+      fetch("/hello-world/message", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sender, message }),
+      })
+        .then((response) => response.json())
+        .then((json) => {
+          // 결과 업데이트하기
+          inputMessage.value = "";
+          inputSender.value = "";
+
+          result_p.innerText = "SUBMIT: " + JSON.stringify(json);
+        });
+    });
+
+    document.getElementById("qryButton").addEventListener("click", (event) => {
+      // 사용자폼에서 사용자입력값 가져오기
+      const inputSender = document.getElementById("sender");
+      const sender = inputSender.value;
+
+      // 결과 업데이트영역 객체 가져오기
+      const result_p = document.getElementById("txResult");
+
+      console.log(sender);
+      // 서버로 GET 요청보내기
+      fetch("/hello-world/message/" + sender, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      })
+        .then((response) => response.json())
+        .then((json) => {
+          // 결과 업데이트하기
+          inputMessage.value = "";
+          inputSender.value = "";
+
+          result_p.innerText = "QUERY: " + JSON.stringify(json);
+        });
+    });
+  </script>
+</html>
