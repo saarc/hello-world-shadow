@@ -1,4 +1,4 @@
-const address = "0xBdb228347e4398B5F26766c123a0C53033D87200";
+const address = "배포된 mytoken-shadow contract address 복사";
 const abi = [
   {
     inputs: [
@@ -69,3 +69,4 @@ const abi = [
 ];
 
 module.exports = { address, abi };
+
