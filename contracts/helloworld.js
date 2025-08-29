@@ -1,4 +1,4 @@
-const address = "0xe1fC8F9C4755e446C6F9C681257992612a436ECC";
+const address = "배포된 contract주소";
 const abi = [
   {
     inputs: [
@@ -40,3 +40,4 @@ const abi = [
 ];
 
 module.exports = { address, abi };
+
