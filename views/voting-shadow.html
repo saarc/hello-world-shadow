@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Voting Shadow Client</title>
+    <!-- 라이브러리 추가 bootstrap, icon css+js -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+      crossorigin="anonymous"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+      crossorigin="anonymous"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <div class="mb-3 mt-5">
+        <!-- 제목 -->
+        <br />
+        <h2><i class="bi bi-check2-circle"></i> Voting Shadow Client</h2>
+      </div>
+      <div class="mb-3">
+        <!-- 입력폼+버튼 -->
+        <form action="#">
+          <!-- sender -->
+          <label for="" class="form-label">지갑계정주소: </label> <br />
+          <input type="text" id="sender" class="form-control" /><br />
+          <!-- cadidate 추가이름 -->
+          <label for="" class="form-label">새로운후보자: </label><br />
+          <input type="text" id="newCandidate" class="form-control" /><br />
+        </form>
+        <br />
+        <!-- 버튼 후보자조회, 투표, 득표조회, 후보자추가 -->
+        <button id="qryVotingBtn" class="btn btn-outline-dark">
+          후보자조회</button
+        >&nbsp;
+        <button id="voteBtn" class="btn btn-outline-danger">후보자투표</button
+        >&nbsp;
+        <button id="qryCondidateBtn" class="btn btn-outline-dark">
+          후보자득표조회</button
+        >&nbsp;
+        <button id="addCandidate" class="btn btn-outline-success">
+          후보자추가
+        </button>
+        <br />
+      </div>
+      <div class="mb-3">
+        <!-- tx결과 -->
+        <p id="txResult" width="100%"></p>
+      </div>
+    </div>
+  </body>
+  <script>
+    // 후보자 조회이벤트처리 /voting/candidates GET
+    document
+      .getElementById("qryVotingBtn")
+      .addEventListener("click", (event) => {
+        // 사용자 입력값 가져오기 -> sender account
+        const inputSender = document.getElementById("sender");
+        const sender = inputSender.value;
+
+        // 결과 업데이트영역 객체 가져오기
+        const result_p = document.getElementById("txResult");
+
+        // 서버로 /voting/candidates GET 요청보내가
+        fetch("/voting/candidates?sender=" + sender, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        })
+          .then((response) => response.json())
+          .then((json) => {
+            result_p.innerText = "CANDIDATES QUERY: " + JSON.stringify(json);
+          });
+      });
+
+    // 후보자 투표이벤트처리 /voting/candidate PUT
+    // 후보자 득표조회이벤트처리 /voting/candidate GET
+    // 후보자 추가이벤트처리 /voting/candidate POST
+  </script>
+</html>
