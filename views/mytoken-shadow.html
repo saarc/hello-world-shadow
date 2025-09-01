@@ -59,6 +59,25 @@
   <script>
     // 발행버튼 클릭 이벤트처리
     // 조회버튼 클릭 이벤트처리
+    document.getElementById("qryBtn").addEventListener("click", (event) => {
+      // 사용자 입력값 가져오기
+      const inputFrom = document.getElementById("from");
+      const from = inputFrom.value;
+
+      // 결과 업데이트영역 객체 가져오기
+      const result_p = document.getElementById("txResult");
+
+      // 서버로 /mytoken/mt GET 요청보내기
+      fetch("/mytoken/mt?from=" + from, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      })
+        .then((response) => response.json())
+        .then((json) => {
+          // 결과 업데이트 하기
+          result_p.innerText = "QUERY: " + JSON.stringify(json);
+        });
+    });
     // 전송버튼 클릭 이벤트처리
     document.getElementById("transBtn").addEventListener("click", (event) => {
       // 사용자 입력값 가져오기
@@ -88,3 +107,4 @@
     });
   </script>
 </html>
+
