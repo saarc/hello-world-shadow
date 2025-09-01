@@ -14,6 +14,9 @@ const sc = new web3.eth.Contract(contract.abi, contract.address);
 const tcontract = require("./contracts/mytoken.js");
 const tsc = new web3.eth.Contract(tcontract.abi, tcontract.address);
 
+const vcontract = require("./contracts/voting.js");
+const vsc = new web3.eth.Contract(vcontract.abi, vcontract.address);
+
 // 서버설정
 const port = 3000; // 0~65535, 0~1024 예약포트, 1024~ 이후로 사용
 
@@ -34,10 +37,16 @@ app.get("/hello-world", (req, res) => {
   res.sendFile(path.join(__dirname, "views", "hello-world-shadow.html"));
 });
 
-// 라우팅 /mytoke GET
+// 라우팅 /mytoken GET
 app.get("/mytoken", (req, res) => {
   console.log("mytoken-shadow.html sent.");
   res.sendFile(path.join(__dirname, "views", "mytoken-shadow.html"));
+});
+
+// 라우팅 /voting GET
+app.get("/voting", (req, res) => {
+  console.log("voting-shadow.html sent.");
+  res.sendFile(path.join(__dirname, "views", "voting-shadow.html"));
 });
 
 // 라우팅 url : /hello-world/message, method: PUT
@@ -104,7 +113,7 @@ app.post("/mytoken/mt/tx", async (req, res) => {
   }
 });
 
-// (TODO) 라우팅 /mytoken/mt GET
+// 라우팅 /mytoken/mt GET
 app.get("/mytoken/mt", async (req, res) => {
   // 요청문서에서 데이터 꺼내기
   const from = req.query.from;
@@ -126,8 +135,38 @@ app.get("/mytoken/mt", async (req, res) => {
 
 // (TODO) 라우팅 /mytoken/mt POST
 
+// voting 라우팅 1 /voting/candidates GET
+app.get("/voting/candidates", async (req, res) => {
+  // 퀴리에서 데이터 꺼내기
+  const sender = req.query.sender;
+
+  // 로그남기기
+  console.log("(VOTING)query candidates message requested: ", sender);
+
+  try {
+    // contract 조회
+    const candidateList = await vsc.methods.getAllCandidates().call();
+
+    let candidates = [];
+    for (let candidate of candidateList) {
+      candidates.push({
+        name: web3.utils.toAscii(candidate),
+        votes: Number(await vsc.methods.totalVotesFor(candidate).call()),
+      });
+    }
+
+    res.status(200).send({ candidates });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send(error); // internal server error code sent to client
+  }
+});
+
+// (TODO) voting 라우팅 2 /voting/candidate PUT
+// (TODO) voting 라우팅 3 /voting/candidate GET
+// (TODO) voting 라우팅 4 /voting/candidate POST
+
 // 서버 시작 (listen)
 app.listen(port, () => {
   console.log(`WEB3 shadow server app listening on port ${port}.`);
 });
-
