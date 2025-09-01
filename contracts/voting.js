@@ -1,4 +1,4 @@
-const address = "0xaFD5D0A66936e10a94194CFEEE8aBa94C69803D5";
+const address = "배포한 voting contract의 주소";
 const abi = [
   {
     inputs: [
@@ -129,3 +129,4 @@ const abi = [
 ];
 
 module.exports = { address, abi };
+
