@@ -105,9 +105,29 @@ app.post("/mytoken/mt/tx", async (req, res) => {
 });
 
 // (TODO) 라우팅 /mytoken/mt GET
+app.get("/mytoken/mt", async (req, res) => {
+  // 요청문서에서 데이터 꺼내기
+  const from = req.query.from;
+
+  // 로그남기기
+  console.log("(MYTOKEN)query message requested: ", from);
+
+  try {
+    // contract 전송호출
+    const message = Number(await tsc.methods.balanceOf(from).call());
+    // const blockNumber = Number(await web3.eth.getBlockNumber());
+    // 결과응답하기
+    res.status(200).send({ message });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send(error);
+  }
+});
+
 // (TODO) 라우팅 /mytoken/mt POST
 
 // 서버 시작 (listen)
 app.listen(port, () => {
   console.log(`WEB3 shadow server app listening on port ${port}.`);
 });
+
