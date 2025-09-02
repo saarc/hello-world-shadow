@@ -4,6 +4,8 @@ const app = express();
 
 const path = require("path");
 
+const { ethers } = require("ethers");
+
 // web3 가져오기, 연결하기, WEB3와 컨트랙트 객체화
 const { Web3 } = require("web3");
 const web3 = new Web3("http://localhost:7545");
@@ -163,7 +165,43 @@ app.get("/voting/candidates", async (req, res) => {
 });
 
 // (TODO) voting 라우팅 2 /voting/candidate PUT
-// (TODO) voting 라우팅 3 /voting/candidate GET
+app.put("/voting/candidate", async (req, res) => {
+  // 바디에서 sender, candidate 가져오기
+  const sender = req.body.sender;
+  const newCandidate = req.body.newCandidate;
+  const candidate = await web3.utils.fromAscii(newCandidate);
+
+  const bytes32_name = ethers.encodeBytes32String(newCandidate);
+
+  // 로그남기기
+  console.log("(VOTING)vote message requested: ", sender, bytes32_name);
+
+  try {
+    // 투표트렌젝션 생성
+    const message = await vsc.methods
+      .voteForCandidate(bytes32_name)
+      .send({ from: sender });
+
+    // 후보자+득표 구조체 만들기
+    const candidateList = await vsc.methods.getAllCandidates().call();
+
+    let candidates = [];
+    for (let candidate of candidateList) {
+      candidates.push({
+        name: web3.utils.toAscii(candidate),
+        votes: Number(await vsc.methods.totalVotesFor(candidate).call()),
+      });
+    }
+
+    // 성공전송
+    res.status(200).send({ candidates });
+  } catch (error) {
+    // 오류전송
+    console.error(error);
+    res.status(500).send(error);
+  }
+});
+
 // (TODO) voting 라우팅 4 /voting/candidate POST
 
 // 서버 시작 (listen)
