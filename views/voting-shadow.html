@@ -45,17 +45,31 @@
         >&nbsp;
         <button id="voteBtn" class="btn btn-outline-danger">후보자투표</button
         >&nbsp;
-        <button id="qryCondidateBtn" class="btn btn-outline-dark">
+        <!-- <button id="qryCondidateBtn" class="btn btn-outline-dark">
           후보자득표조회</button
-        >&nbsp;
+        >&nbsp; -->
         <button id="addCandidate" class="btn btn-outline-success">
           후보자추가
         </button>
         <br />
       </div>
       <div class="mb-3">
+        <!-- TABLE -->
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Candidate</th>
+              <th scope="col">Votes</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyCandidates"></tbody>
+        </table>
+      </div>
+      <div class="mb-3">
         <!-- tx결과 -->
-        <p id="txResult" width="100%"></p>
+        <!-- JSON -->
+        <p id="txResult" class="text-break"></p>
       </div>
     </div>
   </body>
@@ -79,11 +93,65 @@
           .then((response) => response.json())
           .then((json) => {
             result_p.innerText = "CANDIDATES QUERY: " + JSON.stringify(json);
+
+            // 후보자 테이블 채우기
+            if (json.candidates) {
+              let tbodyContents = "";
+              for (let i = 0; i < json.candidates.length; i++) {
+                tbodyContents += `
+                <tr>
+                  <th scope="row">${i + 1}</th>
+                  <td>${json.candidates[i].name}</td>
+                  <td>${json.candidates[i].votes}</td>
+                </tr>
+                `;
+              }
+              const tbodys = document.getElementById("tbodyCandidates");
+              tbodys.innerHTML = tbodyContents;
+            }
           });
       });
 
     // 후보자 투표이벤트처리 /voting/candidate PUT
-    // 후보자 득표조회이벤트처리 /voting/candidate GET
+    document.getElementById("voteBtn").addEventListener("click", (event) => {
+      // 사용자 입력값 가져오기
+      const inputSender = document.getElementById("sender");
+      const sender = inputSender.value;
+
+      const inputNewCandidate = document.getElementById("newCandidate");
+      const newCandidate = inputNewCandidate.value;
+
+      // 결과 업데이트 영역 객체 가져오기
+      const result_p = document.getElementById("txResult");
+
+      // 서버로 /voting/candidate PUT 요청보내기
+      fetch("/voting/candidate", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sender, newCandidate }),
+      })
+        .then((response) => response.json())
+        .then((json) => {
+          // 1. 결과JSON 단락표시
+          result_p.innerText = "CANDIDATE VOTE: " + JSON.stringify(json);
+          // 2. 후보자 테이블 업데이트
+          if (json.candidates) {
+            let tbodyContents = "";
+            for (let i = 0; i < json.candidates.length; i++) {
+              tbodyContents += `
+                <tr>
+                  <th scope="row">${i + 1}</th>
+                  <td>${json.candidates[i].name}</td>
+                  <td>${json.candidates[i].votes}</td>
+                </tr>
+                `;
+            }
+            const tbodys = document.getElementById("tbodyCandidates");
+            tbodys.innerHTML = tbodyContents;
+          }
+        });
+    });
+
     // 후보자 추가이벤트처리 /voting/candidate POST
   </script>
 </html>
